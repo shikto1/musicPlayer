@@ -11,21 +11,24 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.shishir.mymusicplayer.Adapter.SongAdapter;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageButton previous, backward, playPause, forward, next;
-    private TextView songNumberTv, songTitle,artistTv, initTimeInSeekBar, endingTimeInSeekBar;
+    private TextView songNumberTv, songTitle, artistTv, initTimeInSeekBar, endingTimeInSeekBar;
     private ListView songView;
     private SeekBar seekBar;
     private int seekMax;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean myCustomReceiverIsRegistered = false;
     private boolean mySeekBarReceiverIsRegistered = false;
+    private static final int REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,30 +69,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (musicService != null) {
-                    musicService.setSongPosition(position);
-                    musicService.playSong();
-                    songTitle.setText(musicService.getSongTitle());
-                    artistTv.setText(musicService.getArtist());
-                    songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
-                    playPause.setImageResource(R.drawable.icon_pause);
-
-
-
-                    Cursor cursor = managedQuery(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                            new String[] {MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
-                            MediaStore.Audio.Albums._ID+ "=?",
-                            new String[] {String.valueOf(songList.get(position).getImagePath())},
-                            null);
-
-                    if (cursor.moveToFirst()) {
-                        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-                        Toast.makeText(MainActivity.this,path+"blank",Toast.LENGTH_SHORT).show();
-                        // do whatever you need to do
-                    }
-                }
+                playSongSetUp(position);
             }
         });
+
+    }
+
+    private void playSongSetUp(int position) {
+        if (musicService != null) {
+            musicService.setSongPosition(position);
+            musicService.playSong();
+            songTitle.setText(musicService.getSongTitle());
+            artistTv.setText(musicService.getArtist());
+            songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+            playPause.setImageResource(R.drawable.icon_pause);
+
+
+            Cursor cursor = managedQuery(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
+                    MediaStore.Audio.Albums._ID + "=?",
+                    new String[]{String.valueOf(songList.get(position).getImagePath())},
+                    null);
+
+            if (cursor.moveToFirst()) {
+                String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+                Toast.makeText(MainActivity.this, path + "blank", Toast.LENGTH_SHORT).show();
+                // do whatever you need to do
+            }
+        }
 
     }
 
@@ -114,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initTimeInSeekBar = (TextView) findViewById(R.id.itialTimeInSeekBar);
         endingTimeInSeekBar = (TextView) findViewById(R.id.endiTimeInSeekBar);
         songTitle = (TextView) findViewById(R.id.songTitleTv);
-        artistTv=(TextView)findViewById(R.id.artistTvAtMainPage);
+        artistTv = (TextView) findViewById(R.id.artistTvAtMainPage);
 
 
         //ListView And SeekBar.......................................
@@ -283,8 +291,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             playPause.setImageResource(R.drawable.icon_pause);
                         }
 
-                    }
-                   else if (musicService.isPlaying()) {
+                    } else if (musicService.isPlaying()) {
                         playPause.setImageResource(R.drawable.icon_play);
                         musicService.pausePlayer();
                     } else {
@@ -314,5 +321,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(this, SearchSongActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivityForResult(intent, REQUEST_CODE);
+        overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                long songId = data.getLongExtra("songId", 0);
+//                Toast.makeText(this, songListSize + "\n" + songId + "", Toast.LENGTH_SHORT).show();
+
+                for (int i = 0; i < songListSize; i++) {
+                    if (songList.get(i).getID() == songId) {
+                        playSongSetUp(i);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

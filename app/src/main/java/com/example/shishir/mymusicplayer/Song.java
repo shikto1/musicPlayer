@@ -1,6 +1,8 @@
 package com.example.shishir.mymusicplayer;
 
 
+import java.io.Serializable;
+
 public class Song {
 
     private long id;
