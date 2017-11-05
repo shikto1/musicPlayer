@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -45,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean myCustomReceiverIsRegistered = false;
     private boolean mySeekBarReceiverIsRegistered = false;
     private static final int REQUEST_CODE = 0;
+    private ImageView songPicView;
+    String path = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +97,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     null);
 
             if (cursor.moveToFirst()) {
-                String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-                Toast.makeText(MainActivity.this, path + "blank", Toast.LENGTH_SHORT).show();
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+
+                if (path != null) {
+                    Bitmap bitmapImage = BitmapFactory.decodeFile(path);
+                    songPicView.setImageBitmap(bitmapImage);
+                } else {
+                   // songPicView.setImageResource(R.drawable.common_pic);
+                    Toast.makeText(MainActivity.this,"Called",Toast.LENGTH_SHORT).show();
+                }
+
                 // do whatever you need to do
             }
         }
@@ -123,6 +136,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         endingTimeInSeekBar = (TextView) findViewById(R.id.endiTimeInSeekBar);
         songTitle = (TextView) findViewById(R.id.songTitleTv);
         artistTv = (TextView) findViewById(R.id.artistTvAtMainPage);
+
+
+        songPicView = (ImageView) findViewById(R.id.songPic);
 
 
         //ListView And SeekBar.......................................
@@ -334,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this, SearchSongActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivityForResult(intent, REQUEST_CODE);
-        overridePendingTransition(R.anim.slide_from_right,R.anim.slide_to_left);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         return super.onOptionsItemSelected(item);
     }
 
