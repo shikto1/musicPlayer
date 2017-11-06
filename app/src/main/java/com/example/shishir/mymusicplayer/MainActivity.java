@@ -396,11 +396,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         } else {
             if (songPicView.getVisibility() == View.VISIBLE) {
+                songListView.setVisibility(View.VISIBLE);
                 songPicView.setVisibility(View.GONE);
             }
-            if (songListView.getVisibility() == View.GONE) {
-                songListView.setVisibility(View.VISIBLE);
+            else{
+                songPicView.setVisibility(View.VISIBLE);
+                songListView.setVisibility(View.GONE);
             }
+
         }
         return super.onOptionsItemSelected(item);
     }
