@@ -9,9 +9,9 @@ public class Song {
     private String title;
     private String artist;
     private String duration;
-    private String albumId;
+    private long albumId;
 
-    public Song(long songID, String songTitle, String songArtist, String duration, String albumId) {
+    public Song(long songID, String songTitle, String songArtist, String duration, long albumId) {
         id = songID;
         title = songTitle;
         artist = songArtist;
@@ -35,5 +35,5 @@ public class Song {
         return duration;
     }
 
-    public  String getImagePath(){return albumId;}
+    public  long getAlbumId(){return albumId;}
 }

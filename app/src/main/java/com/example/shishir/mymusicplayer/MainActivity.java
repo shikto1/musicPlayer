@@ -2,6 +2,7 @@ package com.example.shishir.mymusicplayer;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,6 +10,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.shishir.mymusicplayer.Adapter.SongAdapter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean myCustomReceiverIsRegistered = false;
     private boolean mySeekBarReceiverIsRegistered = false;
     private static final int REQUEST_CODE = 0;
+    private static final Uri ART_CONTENT_URI = Uri.parse("content://media/external/audio/albumart");
     private ImageView songPicView;
     String path = null;
 
@@ -90,25 +94,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playPause.setImageResource(R.drawable.icon_pause);
 
 
-            Cursor cursor = managedQuery(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
-                    MediaStore.Audio.Albums._ID + "=?",
-                    new String[]{String.valueOf(songList.get(position).getImagePath())},
-                    null);
+            // This sector is for album art...........................................................................
+            loadAlbumArtImage(position);
+//            Cursor cursor = managedQuery(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+//                    new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
+//                    MediaStore.Audio.Albums._ID + "=?",
+//                    new String[]{String.valueOf(songList.get(position).getImagePath())},
+//                    null);
 
-            if (cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+//            if (cursor.moveToFirst()) {
+//                path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+//
+//                if (path != null) {
+//                    Bitmap bitmapImage = BitmapFactory.decodeFile(path);
+//                    songPicView.setImageBitmap(bitmapImage);
+//                } else {
+//                   // songPicView.setImageResource(R.drawable.common_pic);
+//                    Toast.makeText(MainActivity.this,"Called",Toast.LENGTH_SHORT).show();
+//                }
+//
+//                // do whatever you need to do
+//            }
+        }
 
-                if (path != null) {
-                    Bitmap bitmapImage = BitmapFactory.decodeFile(path);
-                    songPicView.setImageBitmap(bitmapImage);
-                } else {
-                   // songPicView.setImageResource(R.drawable.common_pic);
-                    Toast.makeText(MainActivity.this,"Called",Toast.LENGTH_SHORT).show();
-                }
+    }
 
-                // do whatever you need to do
-            }
+    private void loadAlbumArtImage(int position) {
+        Uri albumArtUri = ContentUris.withAppendedId(ART_CONTENT_URI, songList.get(position).getAlbumId());
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
+            songPicView.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -239,8 +256,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra("songChanged", false)) {
                 if (musicService != null && isBound) {
+                    int songPosition = musicService.getSongPosition();
                     songTitle.setText(musicService.getSongTitle());
-                    songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+                    artistTv.setText(songList.get(songPosition).getArtist());
+                    songNumberTv.setText((songPosition + 1) + "/" + songListSize);
+                    loadAlbumArtImage(songPosition);
                 }
             }
             if (intent.getBooleanExtra("hd", false)) {
@@ -273,12 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = v.getId();
         switch (id) {
             case R.id.previousButton: {
-                if (musicService != null && isBound) {
-                    musicService.playPrev();
-                    playPause.setImageResource(R.drawable.icon_pause);
-                    songTitle.setText(musicService.getSongTitle());
-                    songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
-                }
+                playPreviousSong();
                 break;
             }
             case R.id.backwardButton: {
@@ -327,16 +342,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.nextButton: {
-                if (musicService != null && isBound) {
-                    musicService.playNext();
-                    playPause.setImageResource(R.drawable.icon_pause);
-                    songTitle.setText(musicService.getSongTitle());
-                    songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
-                }
+                playNextSong();
                 break;
             }
         }
 
+    }
+
+    private void playNextSong() {
+        if (musicService != null && isBound) {
+            musicService.playNext();
+            playPause.setImageResource(R.drawable.icon_pause);
+            songTitle.setText(musicService.getSongTitle());
+            songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+            loadAlbumArtImage(musicService.getSongPosition());
+        }
+
+    }
+
+    private void playPreviousSong() {
+        if (musicService != null && isBound) {
+            musicService.playPrev();
+            playPause.setImageResource(R.drawable.icon_pause);
+            songTitle.setText(musicService.getSongTitle());
+            songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+            loadAlbumArtImage(musicService.getSongPosition());
+        }
     }
 
     @Override
@@ -369,5 +400,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
+    }
+
+    @Override
+    protected void onStart() {
+        songPicView.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
+            @Override
+            public void onSwipeRight() {
+                if (musicService.isPlaying()) {
+                    playPreviousSong();
+                }
+            }
+
+            @Override
+            public void onSwipeLeft() {
+                if (musicService.isPlaying()) {
+                    playNextSong();
+                }
+            }
+        });
+        super.onStart();
     }
 }

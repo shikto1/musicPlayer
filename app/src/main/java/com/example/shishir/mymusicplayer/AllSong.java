@@ -40,7 +40,7 @@ public class AllSong {
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String duration = formatToRealTime(musicCursor.getLong(durationColmn));
-                String albumId=musicCursor.getString(pathColumn);
+                long albumId=musicCursor.getLong(pathColumn);
                 songList.add(new Song(thisId, thisTitle, thisArtist, duration, albumId));
             }
             while (musicCursor.moveToNext());
