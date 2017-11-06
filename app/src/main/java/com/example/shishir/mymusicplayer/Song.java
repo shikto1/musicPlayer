@@ -3,7 +3,7 @@ package com.example.shishir.mymusicplayer;
 
 import java.io.Serializable;
 
-public class Song {
+public class Song implements Serializable {
 
     private long id;
     private String title;

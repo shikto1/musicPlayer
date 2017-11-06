@@ -38,7 +38,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private IBinder binder = new MusicBinder();
     private ArrayList<Song> songList;
     private int songListSize;
-    private int songPosition;
+    private static int songPosition;
     String LOG_TAG = "kdjf";
 
     //Variable For Updating SeekBar in MainActivity..............................
@@ -183,7 +183,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-
 //
 //        Intent prevIntent = new Intent();
 //        PendingIntent pendingIntentPrev = PendingIntent.getBroadcast(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -198,7 +197,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setContentTitle("Now playing")
                 .setContentText(songTitle);
 
-       // builder.addAction(R.drawable.icon_previous_color,"Prev",pendInt);
+        // builder.addAction(R.drawable.icon_previous_color,"Prev",pendInt);
 
         Notification not = builder.build();
         startForeground(Constants.NOTIFICATION_ID, not);
@@ -283,6 +282,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         songPosition++;
         if (songPosition >= songListSize) songPosition = 0;
         playSong();
+
     }
 
 
@@ -301,6 +301,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void seekTo(int position) {
         player.seekTo(position);
     }
+
 
     public void go() {
         if (!isPlaying) {

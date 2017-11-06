@@ -31,7 +31,8 @@ public class SearchSongActivity extends AppCompatActivity implements SearchView.
 
     private void initSearchView() {
         intent = getIntent();
-        songList = new AllSong().getSongList(this);
+       // songList = new AllSong().getSongList(this);
+        songList= (ArrayList<Song>) intent.getSerializableExtra("songList");
         searchView = (SearchView) findViewById(R.id.searchSong);
         songListViewForSearch = (ListView) findViewById(R.id.songlistSearch);
         songListViewForSearch.setAdapter(new SongAdapterForSearchList(this, songList));

@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:paddingTop="@dimen/normalMargin"
     android:paddingLeft="@dimen/padding"
-    android:background="@color/colorAccent"
+    android:background="@drawable/selector_for_listview_item"
     android:paddingRight="@dimen/padding"
     android:paddingBottom="@dimen/normalMargin"
     xmlns:android="http://schemas.android.com/apk/res/android">
