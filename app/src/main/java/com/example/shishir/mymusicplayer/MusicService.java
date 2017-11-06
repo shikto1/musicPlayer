@@ -17,10 +17,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,12 +33,13 @@ import java.util.ArrayList;
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     private MediaPlayer player;
-    private String songTitle = "", artist=" ";
+    private String songTitle = "", artist = " ";
     private boolean isPlaying = false;
     private IBinder binder = new MusicBinder();
     private ArrayList<Song> songList;
     private int songListSize;
     private int songPosition;
+    String LOG_TAG = "kdjf";
 
     //Variable For Updating SeekBar in MainActivity..............................
 
@@ -134,8 +137,27 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+//        if (intent.getAction().equals(Constants.START_FOREGROUND_SERVICE)) {
+//            showNotification();
+//            Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
+//
+//        }
         return START_STICKY;
     }
+
+//    private void showNotification() {
+//        Notification status;
+//        RemoteViews smallViews = new RemoteViews(getPackageName(),
+//                R.layout.small_views);
+//        RemoteViews bigViews = new RemoteViews(getPackageName(),
+//                R.layout.status_bar);
+//        status = new Notification.Builder(this).build();
+//        status.contentView = smallViews;
+//        status.flags = Notification.FLAG_ONGOING_EVENT;
+//        status.icon = R.drawable.icon_play_color;
+//        //status.contentIntent = ;
+//        startForeground(Constants.NOTIFICATION_ID, status);
+//    }
 
     @Nullable
     @Override
@@ -160,7 +182,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(this);
+
+
+//
+//        Intent prevIntent = new Intent();
+//        PendingIntent pendingIntentPrev = PendingIntent.getBroadcast(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         builder.setContentIntent(pendInt)
                 .setSmallIcon(R.mipmap.icon_play_for_notification)
@@ -168,6 +197,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setOngoing(true)
                 .setContentTitle("Now playing")
                 .setContentText(songTitle);
+
+       // builder.addAction(R.drawable.icon_previous_color,"Prev",pendInt);
+
         Notification not = builder.build();
         startForeground(Constants.NOTIFICATION_ID, not);
     }
@@ -181,7 +213,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Song selectedSong = songList.get(songPosition);
         //get title
         songTitle = selectedSong.getTitle();
-        artist=selectedSong.getArtist();
+        artist = selectedSong.getArtist();
         //get id
         long currSong = selectedSong.getID();
         //set uri
@@ -290,8 +322,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return songTitle;
     }
 
-    public  String getArtist(){
-        return  artist;
+    public String getArtist() {
+        return artist;
     }
 
     @Override

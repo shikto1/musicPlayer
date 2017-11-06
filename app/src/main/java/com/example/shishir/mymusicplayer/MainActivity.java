@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -59,12 +60,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBar actionBar=getSupportActionBar();
+        actionBar.setLogo(R.drawable.icon_music_color);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
 //
 //        View decorView = getWindow().getDecorView();
 //        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 //        decorView.setSystemUiVisibility(uiOptions);
 
-        startService(new Intent(this, MusicService.class));
+        Intent serviceIntent=new Intent(this, MusicService.class);
+       // serviceIntent.setAction(Constants.START_FOREGROUND_SERVICE);
+        startService(serviceIntent);
         findViewById();
         //       Toast.makeText(MainActivity.this, "onCreate in activity", Toast.LENGTH_SHORT).show();
 
