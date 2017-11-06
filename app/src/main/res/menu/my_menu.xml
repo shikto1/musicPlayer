@@ -5,8 +5,15 @@
     tools:context="codes4.com.simplelistview.MainActivity">
 
     <item
+        android:id="@+id/music_list"
+        android:title="Song List"
+        app:showAsAction="always"
+        android:icon="@drawable/icon_music_list"
+        />
+
+    <item
         android:id="@+id/menu_search"
-        android:title="Search"
+        android:title="Search Song"
         app:showAsAction="always"
         android:icon="@drawable/icon_search"
         />

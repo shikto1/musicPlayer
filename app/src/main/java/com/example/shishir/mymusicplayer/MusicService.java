@@ -163,10 +163,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Notification.Builder builder = new Notification.Builder(this);
 
         builder.setContentIntent(pendInt)
-                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setSmallIcon(R.mipmap.icon_play_for_notification)
                 .setTicker(songList.get(songPosition).getTitle())
                 .setOngoing(true)
-                .setContentTitle("Playing")
+                .setContentTitle("Now playing")
                 .setContentText(songTitle);
         Notification not = builder.build();
         startForeground(Constants.NOTIFICATION_ID, not);

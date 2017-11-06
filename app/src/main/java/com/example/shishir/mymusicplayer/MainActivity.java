@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 playSongSetUp(position);
+                songPicView.setVisibility(View.VISIBLE);
+                songListView.setVisibility(View.GONE);
+
             }
         });
 
@@ -96,25 +99,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // This sector is for album art...........................................................................
             loadAlbumArtImage(position);
-//            Cursor cursor = managedQuery(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-//                    new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
-//                    MediaStore.Audio.Albums._ID + "=?",
-//                    new String[]{String.valueOf(songList.get(position).getImagePath())},
-//                    null);
-
-//            if (cursor.moveToFirst()) {
-//                path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-//
-//                if (path != null) {
-//                    Bitmap bitmapImage = BitmapFactory.decodeFile(path);
-//                    songPicView.setImageBitmap(bitmapImage);
-//                } else {
-//                   // songPicView.setImageResource(R.drawable.common_pic);
-//                    Toast.makeText(MainActivity.this,"Called",Toast.LENGTH_SHORT).show();
-//                }
-//
-//                // do whatever you need to do
-//            }
         }
 
     }
@@ -189,9 +173,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             musicService = musicBinder.getService();
             isBound = true;
             if (musicService.isPlaying()) {
+                int songPosition = musicService.getSongPosition();
                 playPause.setImageResource(R.drawable.icon_pause);
-                songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+                songNumberTv.setText((songPosition + 1) + "/" + songListSize);
+                artistTv.setText(songList.get(songPosition).getArtist());
                 songTitle.setText(musicService.getSongTitle());
+                loadAlbumArtImage(songPosition);
+                songPicView.setVisibility(View.VISIBLE);
+                songListView.setVisibility(View.GONE);
+                musicService.stopForeground(true);
             }
             //    Toast.makeText(MainActivity.this, "Service connection", Toast.LENGTH_SHORT).show();
         }
@@ -354,7 +344,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             musicService.playNext();
             playPause.setImageResource(R.drawable.icon_pause);
             songTitle.setText(musicService.getSongTitle());
-            songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+            int songPosition = musicService.getSongPosition();
+            artistTv.setText(songList.get(songPosition).getArtist());
+            songNumberTv.setText((songPosition + 1) + "/" + songListSize);
             loadAlbumArtImage(musicService.getSongPosition());
         }
 
@@ -365,7 +357,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             musicService.playPrev();
             playPause.setImageResource(R.drawable.icon_pause);
             songTitle.setText(musicService.getSongTitle());
-            songNumberTv.setText((musicService.getSongPosition() + 1) + "/" + songListSize);
+            int songPosition = musicService.getSongPosition();
+            artistTv.setText(songList.get(songPosition).getArtist());
+            songNumberTv.setText((songPosition + 1) + "/" + songListSize);
             loadAlbumArtImage(musicService.getSongPosition());
         }
     }
@@ -378,10 +372,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(this, SearchSongActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivityForResult(intent, REQUEST_CODE);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        int id = item.getItemId();
+        if (id == R.id.menu_search) {
+            Intent intent = new Intent(this, SearchSongActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivityForResult(intent, REQUEST_CODE);
+            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        } else {
+            if (songPicView.getVisibility() == View.VISIBLE) {
+                songPicView.setVisibility(View.GONE);
+            }
+            if (songListView.getVisibility() == View.GONE) {
+                songListView.setVisibility(View.VISIBLE);
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -395,6 +399,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 for (int i = 0; i < songListSize; i++) {
                     if (songList.get(i).getID() == songId) {
                         playSongSetUp(i);
+                        songPicView.setVisibility(View.VISIBLE);
+                        songListView.setVisibility(View.GONE);
                         break;
                     }
                 }
