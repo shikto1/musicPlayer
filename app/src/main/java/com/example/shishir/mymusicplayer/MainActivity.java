@@ -189,16 +189,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 songPicView.setVisibility(View.VISIBLE);
                 songListView.setVisibility(View.GONE);
                 musicService.stopForeground(true);
-            } else {
-                musicService.setSongPosition(0);
-                songNumberTv.setText("1/" + songListSize);
-                songTitle.setText(songList.get(0).getTitle());
-                artistTv.setText(songList.get(0).getArtist());
-                playPause.setImageResource(R.drawable.icon_play);
-                loadAlbumArtImage(0);
-                songPicView.setVisibility(View.VISIBLE);
-                songListView.setVisibility(View.GONE);
-            }
+           }
+// else {
+//                musicService.setSongPosition(0);
+//                songNumberTv.setText("1/" + songListSize);
+//                songTitle.setText(songList.get(0).getTitle());
+//                artistTv.setText(songList.get(0).getArtist());
+//                playPause.setImageResource(R.drawable.icon_play);
+//                loadAlbumArtImage(0);
+//                songPicView.setVisibility(View.VISIBLE);
+//                songListView.setVisibility(View.GONE);
+//            }
             //    Toast.makeText(MainActivity.this, "Service connection", Toast.LENGTH_SHORT).show();
         }
 
@@ -319,6 +320,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             playPause.setImageResource(R.drawable.icon_pause);
                             songNumberTv.setText(1 + "/" + songListSize);
                             songTitle.setText(musicService.getSongTitle());
+                            artistTv.setText(songList.get(0).getArtist());
+                            loadAlbumArtImage(0);
+                            songPicView.setVisibility(View.VISIBLE);
+                            songListView.setVisibility(View.GONE);
                         } else if (musicService.isPlaying()) {
                             musicService.pausePlayer();
                             playPause.setImageResource(R.drawable.icon_play);
