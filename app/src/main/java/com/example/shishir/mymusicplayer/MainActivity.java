@@ -1,5 +1,6 @@
 package com.example.shishir.mymusicplayer;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -69,11 +70,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
 //        decorView.setSystemUiVisibility(uiOptions);
 
-        Intent serviceIntent = new Intent(this, MusicService.class);
-        // serviceIntent.setAction(Constants.START_FOREGROUND_SERVICE);
-        startService(serviceIntent);
+        if (!isMyServiceRunning()) {
+            Intent serviceIntent = new Intent(this, MusicService.class);
+            // serviceIntent.setAction(Constants.START_FOREGROUND_SERVICE);
+            startService(serviceIntent);
+        }
         findViewById();
-        //       Toast.makeText(MainActivity.this, "onCreate in activity", Toast.LENGTH_SHORT).show();
 
 
         songList = new AllSong().getSongList(this);
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 songPicView.setVisibility(View.VISIBLE);
                 songListView.setVisibility(View.GONE);
                 musicService.stopForeground(true);
-           }
+            }
 // else {
 //                musicService.setSongPosition(0);
 //                songNumberTv.setText("1/" + songListSize);
@@ -403,8 +405,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (songPicView.getVisibility() == View.VISIBLE) {
                 songListView.setVisibility(View.VISIBLE);
                 songPicView.setVisibility(View.GONE);
-            }
-            else{
+            } else {
                 songPicView.setVisibility(View.VISIBLE);
                 songListView.setVisibility(View.GONE);
             }
@@ -451,5 +452,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         super.onStart();
+    }
+
+    private boolean isMyServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (MusicService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
