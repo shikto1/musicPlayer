@@ -61,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setLogo(R.drawable.icon_music_color);
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
 //
 //        View decorView = getWindow().getDecorView();
 //        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -146,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         endingTimeInSeekBar = (TextView) findViewById(R.id.endiTimeInSeekBar);
         songTitle = (TextView) findViewById(R.id.songTitleTv);
         artistTv = (TextView) findViewById(R.id.artistTvAtMainPage);
+        songTitle.setSelected(true);
 
 
         songPicView = (ImageView) findViewById(R.id.songPic);
